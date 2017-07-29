@@ -3,8 +3,6 @@
  */
 package com.shutterfly.ltv.model;
 
-import java.util.Date;
-
 /**
  * @author bhanu
  * @since 07/27/2017
@@ -12,7 +10,6 @@ import java.util.Date;
  */
 public class Image extends Event{
 	private String imageId;
-	private String image;
 	private String verb;
 	private String customerId;
 	private String cameraMake;
@@ -28,18 +25,6 @@ public class Image extends Event{
 	 */
 	public void setImageId(String imageId) {
 		this.imageId = imageId;
-	}
-	/**
-	 * @return the image
-	 */
-	public String getImage() {
-		return image;
-	}
-	/**
-	 * @param image the image to set
-	 */
-	public void setImage(String image) {
-		this.image = image;
 	}
 	/**
 	 * @return the verb

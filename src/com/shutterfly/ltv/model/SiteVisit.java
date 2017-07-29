@@ -4,6 +4,7 @@
 package com.shutterfly.ltv.model;
 
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @author bhanu
@@ -11,22 +12,23 @@ import java.util.Date;
  *
  */
 public class SiteVisit extends Event{
-	private String pageId;
+	private String siteVisitId;
 	private String type;
 	private String verb;
 	private String customerId;
-	private String tags;
+	// Array of key value pairs
+	private HashMap<String, String> tags;
 	/**
-	 * @return the pageId
+	 * @return the siteVisitId
 	 */
-	public String getPageId() {
-		return pageId;
+	public String getSiteVisitId() {
+		return siteVisitId;
 	}
 	/**
-	 * @param pageId the pageId to set
+	 * @param siteVisitId the siteVisitId to set
 	 */
-	public void setPageId(String pageId) {
-		this.pageId = pageId;
+	public void setSiteVisitId(String siteVisitId) {
+		this.siteVisitId = siteVisitId;
 	}
 	/**
 	 * @return the type
@@ -67,13 +69,13 @@ public class SiteVisit extends Event{
 	/**
 	 * @return the tags
 	 */
-	public String getTags() {
+	public HashMap<String, String> getTags() {
 		return tags;
 	}
 	/**
 	 * @param tags the tags to set
 	 */
-	public void setTags(String tags) {
+	public void setTags(HashMap<String, String> tags) {
 		this.tags = tags;
 	}
 }

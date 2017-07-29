@@ -3,42 +3,27 @@
  */
 package com.shutterfly.ltv.model;
 
-import java.util.Date;
-
 /**
  * @author bhanu
  * @since 07/27/2017
  *
  */
 public class Order extends Event{
-	private String order_id;
-	private String type;
+	private String orderId;
 	private String verb;
 	private String customerId;
 	private double totalAmount;
 	/**
-	 * @return the order_id
+	 * @return the orderId
 	 */
-	public String getOrder_id() {
-		return order_id;
+	public String getOrderId() {
+		return orderId;
 	}
 	/**
-	 * @param order_id the order_id to set
+	 * @param orderId the orderId to set
 	 */
-	public void setOrder_id(String order_id) {
-		this.order_id = order_id;
-	}
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
-	}
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
 	}
 	/**
 	 * @return the verb

@@ -1,30 +1,30 @@
 package com.shutterfly.ltv.model;
-
-import java.util.Date;
 /**
  * @author bhanu
  * @since 07/27/2017
  *
  */
 public class Customer extends Event{
-	private String customer_id;	
+	private String customerId;	
 	private String type;
 	private String verb;
 	private String lastName;
 	private String adrCity;
 	private String adrState;
-	
+	public Customer(){
+		super();
+	}
 	/**
-	 * @param customer_id
+	 * @param customerId
 	 * @param type
 	 * @param verb
 	 * @param lastName
 	 * @param adrCity
 	 * @param adrState
 	 */
-	public Customer(String customer_id, String type, String verb, String lastName, String adrCity, String adrState) {
+	public Customer(String customerId, String type, String verb, String lastName, String adrCity, String adrState) {
 		super();
-		this.customer_id = customer_id;
+		this.customerId = customerId;
 		this.type = type;
 		this.verb = verb;
 		this.lastName = lastName;
@@ -32,16 +32,16 @@ public class Customer extends Event{
 		this.adrState = adrState;
 	}
 	/**
-	 * @return the customer_id
+	 * @return the customerId
 	 */
-	public String getCustomer_id() {
-		return customer_id;
+	public String getCustomerId() {
+		return customerId;
 	}
 	/**
-	 * @param customer_id the customer_id to set
+	 * @param customerId the customerId to set
 	 */
-	public void setCustomer_id(String customer_id) {
-		this.customer_id = customer_id;
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
 	}
 	/**
 	 * @return the type
