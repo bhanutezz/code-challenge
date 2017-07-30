@@ -3,17 +3,21 @@
  */
 package com.shutterfly.ltv.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * @author bhanu
  *
  */
 public class Data {
-	HashMap<String, Customer> customers;
-	HashMap<String, SiteVisit> siteVisits;
-	HashMap<String, Image> iamges;
-	HashMap<String, Order> orders;
+	private HashMap<String, Customer> customers;
+	private HashMap<String, SiteVisit> siteVisits;
+	private HashMap<String, Image> images;
+	private HashMap<String, Order> orders;
+	HashMap<String,ArrayList<SiteVisit>> customerSiteVisists;
+	HashMap<String, LinkedList<Order>> customerOrders;
 	public int averageCustomerLifespan = 10;
 	/**
 	 * @return the customers
@@ -40,16 +44,16 @@ public class Data {
 		this.siteVisits = siteVisits;
 	}
 	/**
-	 * @return the iamges
+	 * @return the images
 	 */
-	public HashMap<String, Image> getIamges() {
-		return iamges;
+	public HashMap<String, Image> getImages() {
+		return images;
 	}
 	/**
-	 * @param iamges the iamges to set
+	 * @param images the images to set
 	 */
-	public void setIamges(HashMap<String, Image> iamges) {
-		this.iamges = iamges;
+	public void setImages(HashMap<String, Image> images) {
+		this.images = images;
 	}
 	/**
 	 * @return the orders
@@ -74,6 +78,30 @@ public class Data {
 	 */
 	public void setAverageCustomerLifespan(int averageCustomerLifespan) {
 		this.averageCustomerLifespan = averageCustomerLifespan;
+	}
+	/**
+	 * @return the customerSiteVisists
+	 */
+	public HashMap<String, ArrayList<SiteVisit>> getCustomerSiteVisists() {
+		return customerSiteVisists;
+	}
+	/**
+	 * @param customerSiteVisists the customerSiteVisists to set
+	 */
+	public void setCustomerSiteVisists(HashMap<String, ArrayList<SiteVisit>> customerSiteVisists) {
+		this.customerSiteVisists = customerSiteVisists;
+	}
+	/**
+	 * @return the customerOrders
+	 */
+	public HashMap<String, LinkedList<Order>> getCustomerOrders() {
+		return customerOrders;
+	}
+	/**
+	 * @param customerOrders the customerOrders to set
+	 */
+	public void setCustomerOrders(HashMap<String, LinkedList<Order>> customerOrders) {
+		this.customerOrders = customerOrders;
 	}
 	
 }

@@ -1,4 +1,7 @@
 package com.shutterfly.ltv.model;
+
+import java.util.Date;
+
 /**
  * @author bhanu
  * @since 07/27/2017
@@ -11,6 +14,7 @@ public class Customer extends Event{
 	private String lastName;
 	private String adrCity;
 	private String adrState;
+	private Date lastVisited;
 	public Customer(){
 		super();
 	}
@@ -42,6 +46,18 @@ public class Customer extends Event{
 	 */
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
+	}
+	/**
+	 * @return the lastVisited
+	 */
+	public Date getLastVisited() {
+		return lastVisited;
+	}
+	/**
+	 * @param lastVisited the lastVisited to set
+	 */
+	public void setLastVisited(Date firstVisited) {
+		this.lastVisited = firstVisited;
 	}
 	/**
 	 * @return the type

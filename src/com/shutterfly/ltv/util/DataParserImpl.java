@@ -7,20 +7,18 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.shutterfly.ltv.main.CustomerLifetimeValueHelper;
-import com.shutterfly.ltv.model.Customer;
 import com.shutterfly.ltv.model.Data;
-import com.shutterfly.ltv.model.Image;
-import com.shutterfly.ltv.model.Order;
-import com.shutterfly.ltv.model.SiteVisit;
+import com.shutterfly.ltv.model.Event;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-//import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+//import org.json.JSONObject;
+//import org.json.JSONArray;
+import org.json.simple.JSONObject;
 /**
  * @author bhanu
  *
@@ -59,31 +57,38 @@ public class DataParserImpl {
 		return data;
 	}
 	
+	/**
+	 * This method is local for DataParserImpl class to segregate different event types JSON objects to
+	 * ingest into final Data object
+	 * @param singleEvent
+	 * @param data
+	 * @return data
+	 */
 	private Data ingestEvent(JSONObject singleEvent, Data data){
 		String eventType = (String)singleEvent.get("type");
-		EventToDataIngest ingestEvent = null;
+		EventToDataIngestImpl ingestEvent = null;
 		CustomerLifetimeValueHelper ltvHelper = new CustomerLifetimeValueHelper();
 		System.out.println(eventType);
 		switch(eventType){
 			case "CUSTOMER":
-				ingestEvent = new EventToDataIngest();
-				Customer customer = ingestEvent.addCustomerJSONObject(singleEvent);
-				ltvHelper.ingest(customer, data);
+				ingestEvent = new EventToDataIngestImpl();
+				Event customerEvent = ingestEvent.addCustomerJSONObject(singleEvent);
+				data = ltvHelper.ingest(customerEvent, data);
 				break;
 			case "SITE_VISIT":
-				ingestEvent = new EventToDataIngest();
-				SiteVisit siteVisit = ingestEvent.addSiteVisitJSONObject(singleEvent);
-				ltvHelper.ingest(siteVisit, data);
+				ingestEvent = new EventToDataIngestImpl();
+				Event siteVisitEvent = ingestEvent.addSiteVisitJSONObject(singleEvent);
+				data = ltvHelper.ingest(siteVisitEvent, data);
 				break;
 			case "IMAGE":
-				ingestEvent = new EventToDataIngest();
-				Image image = ingestEvent.addImageJSONObject(singleEvent);
-				ltvHelper.ingest(image, data);
+				ingestEvent = new EventToDataIngestImpl();
+				Event imageEvent = ingestEvent.addImageJSONObject(singleEvent);
+				data = ltvHelper.ingest(imageEvent, data);
 				break;
 			case "ORDER":
-				ingestEvent = new EventToDataIngest();
-				Order order = ingestEvent.addOrderJSONObject(singleEvent);
-				ltvHelper.ingest(order, data);
+				ingestEvent = new EventToDataIngestImpl();
+				Event orderEvent = ingestEvent.addOrderJSONObject(singleEvent);
+				data = ltvHelper.ingest(orderEvent, data);
 				break;
 			default:
 				throw new IllegalArgumentException("Invalid event type" + eventType +"Expected CUSTOMER/ SITE_VISIT/ IMAGE/ ORDER type");

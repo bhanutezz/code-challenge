@@ -10,9 +10,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,11 +29,12 @@ import com.shutterfly.ltv.model.SiteVisit;
  * @author bhanu
  *
  */
-public class EventToDataIngest {
+public class EventToDataIngestImpl implements EventToDataIngest{
 	public CustomerLifetimeValueHelper cltvHelper =null;
 	
 	public Customer addCustomerJSONObject(JSONObject customerJSON){
 		Customer customer = new Customer();
+		customer.setEventId((String)customerJSON.get("key"));
 		customer.setCustomerId((String)customerJSON.get("key"));
 		customer.setType((String)customerJSON.get("type"));
 		customer.setVerb((String)customerJSON.get("verb"));
@@ -44,11 +47,13 @@ public class EventToDataIngest {
 		customer.setLastName((String)customerJSON.get("last_name"));
 		customer.setAdrCity((String)customerJSON.get("adr_city"));
 		customer.setAdrState((String)customerJSON.get("adr_state"));
+		customer.setLastVisited(customer.getEventTime());
 		return customer;
 
 	}
 	public SiteVisit addSiteVisitJSONObject(JSONObject siteVisitJSON){
 		SiteVisit siteVisit = new SiteVisit();
+		siteVisit.setEventId((String)siteVisitJSON.get("key"));
 		siteVisit.setSiteVisitId((String)siteVisitJSON.get("key"));
 		siteVisit.setCustomerId((String)siteVisitJSON.get("customer_id"));
 		siteVisit.setType((String)siteVisitJSON.get("type"));
@@ -63,7 +68,7 @@ public class EventToDataIngest {
 		// This block of code uses Jackson core and Jackson databind libraries to
 		// retrieve Array of site-visit tags from SiteVisist event
 		// Assuming that tags property may contain multiple tags with unknown key value pairs
-		try{
+		/*try{
 			ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 			JsonNode root = mapper.readTree((String)siteVisitJSON.get("tags"));
 			Iterator<Map.Entry<String, JsonNode>> iterator = root.fields();
@@ -75,41 +80,59 @@ public class EventToDataIngest {
 			siteVisit.setTags(siteTags);
 		}catch(JSONException | IOException e){
 			e.printStackTrace();
+		}*/
+		JSONArray tagsJ =(JSONArray)siteVisitJSON.get("tags");
+		HashMap<String, String> tags = new HashMap<>();
+		Iterator<?> itr = tagsJ.iterator();
+		while(itr.hasNext()){
+			JSONObject jsonObj = (JSONObject) itr.next();
+			Iterator<?> itrPair = jsonObj.entrySet().iterator();
+			Entry entry = null;
+			while (itrPair.hasNext()) {
+				entry = (Entry) itrPair.next();
+				tags.put((String) entry.getKey(), (String) entry.getValue());
+			}
 		}
+		siteVisit.setTags(tags);
 		return siteVisit;
 	}
 	public Image addImageJSONObject(JSONObject imageJSON){
 		Image image =  new Image();
-		image.setImageId((String)imageJSON.getString("key"));
-		image.setType((String)imageJSON.getString("type"));
-		image.setVerb((String)imageJSON.getString("verb"));
+		image.setEventId((String)imageJSON.get("key"));
+		image.setImageId((String)imageJSON.get("key"));
+		image.setType((String)imageJSON.get("type"));
+		image.setVerb((String)imageJSON.get("verb"));
 		try {
-			image.setEventTime(parseDate((String)imageJSON.getString("event_time")));
+			image.setEventTime(parseDate((String)imageJSON.get("event_time")));
 		} catch (JSONException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		image.setCustomerId((String)imageJSON.getString("customer_id"));
-		image.setCameraMake((String)imageJSON.getString("camera_make"));
-		image.setCameraModel((String)imageJSON.getString("camera_model"));
+		image.setCustomerId((String)imageJSON.get("customer_id"));
+		image.setCameraMake((String)imageJSON.get("camera_make"));
+		image.setCameraModel((String)imageJSON.get("camera_model"));
 		return image;
 		
 	}
 	public Order addOrderJSONObject(JSONObject orderJSON){
 		Order order = new Order();
-		order.setOrderId((String)orderJSON.getString("key"));
-		order.setType((String)orderJSON.getString("type"));
-		order.setVerb((String)orderJSON.getString("verb"));
+		order.setEventId((String)orderJSON.get("key"));
+		order.setOrderId((String)orderJSON.get("key"));
+		order.setType((String)orderJSON.get("type"));
+		order.setVerb((String)orderJSON.get("verb"));
 		//parsing event time into date format
 		try {
-			order.setEventTime(parseDate((String)orderJSON.getString("event_time")));
+			order.setEventTime(parseDate((String)orderJSON.get("event_time")));
 		} catch (JSONException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		order.setCustomerId((String)orderJSON.getString("customer_id"));
+		order.setCustomerId((String)orderJSON.get("customer_id"));
 		// Assuming total amount contains order value and currency type, it handles leading and trailing spaces
-		String[] amountInfo = (String[])(orderJSON.getString("total_amount").trim()).split(" ", 1);
+		//String[] amountInfo = (String[])(orderJSON.getString("total_amount").trim()).split(" ", 1);
+		String amount = (String)(orderJSON.get("total_amount"));
+		String[] amountInfo = amount.trim().split(" ", 0);
+		System.out.println(amountInfo[0]);
 		//amountInfo[0] contains order amount and amountInfo[1] contains currency type
 		order.setTotalAmount(Double.parseDouble(amountInfo[0]));
 		return order;
@@ -117,8 +140,7 @@ public class EventToDataIngest {
 	}
 	public Date parseDate(String dateString) throws ParseException{
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'");
-			Date dateFormatted = dateFormat.parse(dateString);
-	
+		Date dateFormatted = dateFormat.parse(dateString);
 		return dateFormatted;
 	}
 }

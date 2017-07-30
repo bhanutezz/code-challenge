@@ -13,7 +13,6 @@ public class Event {
 	private Date eventTime;
 	private String eventId;
 	private String type;
-
 	/**
 	 * @return the type
 	 */
