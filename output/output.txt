@@ -1,1 +1,4 @@
-Your output data will end up here
+CustomerId    Name  City    State  LifeTimeValue
+95y94a5b1v10	ABC	Middletown	MA	45384.3
+30c94y8v7u43	Smith	Middletown	AK	36335.52
+32q93m5a0c72	Smith	Middletown	AK	32350.93
