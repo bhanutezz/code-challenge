@@ -8,8 +8,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
+ * Data class is to store total data related to all events, which is used to calculate Customer Life Time Value
  * @author bhanu
- *
+ * @since 07/27/2017
  */
 public class Data {
 	private HashMap<String, Customer> customers;

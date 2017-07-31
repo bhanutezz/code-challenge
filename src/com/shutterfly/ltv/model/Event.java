@@ -6,8 +6,10 @@ package com.shutterfly.ltv.model;
 import java.util.Date;
 
 /**
+ * Event class is Super class for all event classes which holds common event informaiton
+ * as well as useful in handling all events in generic ingestion methods and other life time value calculations
  * @author bhanu
- *
+ * @since 07/27/2017
  */
 public class Event {
 	private Date eventTime;

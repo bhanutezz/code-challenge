@@ -3,35 +3,35 @@
  */
 package com.shutterfly.ltv.util;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shutterfly.ltv.main.CustomerLifetimeValueHelper;
 import com.shutterfly.ltv.model.Customer;
 import com.shutterfly.ltv.model.Image;
 import com.shutterfly.ltv.model.Order;
 import com.shutterfly.ltv.model.SiteVisit;
 
 /**
+ * EventToDataIngestImpl implements EventToDataIngest interface methods to ingest all events JSON data into Data object
  * @author bhanu
- *
+ * @since 07/27/2017
  */
 public class EventToDataIngestImpl implements EventToDataIngest{
-	public CustomerLifetimeValueHelper cltvHelper =null;
 	
+	/**
+	 * This method is for binding customer JSON object to Customer model class
+	 * @see com.shutterfly.ltv.util.EventToDataIngest#addCustomerJSONObject(org.json.simple.JSONObject)
+	 * @param customerJSON 
+	 * @return Customer Customer object
+	 */
 	public Customer addCustomerJSONObject(JSONObject customerJSON){
 		Customer customer = new Customer();
 		customer.setEventId((String)customerJSON.get("key"));
@@ -51,6 +51,12 @@ public class EventToDataIngestImpl implements EventToDataIngest{
 		return customer;
 
 	}
+	/**
+	 * This method is for binding SITE_VISIT JSON object to SiteVisit model class
+	 * @see com.shutterfly.ltv.util.EventToDataIngest#addSiteVisitJSONObject(org.json.simple.JSONObject)
+	 * @param siteVisitJSON 
+	 * @return SiteVisit SiteVisit object
+	 */
 	public SiteVisit addSiteVisitJSONObject(JSONObject siteVisitJSON){
 		SiteVisit siteVisit = new SiteVisit();
 		siteVisit.setEventId((String)siteVisitJSON.get("key"));
@@ -96,6 +102,12 @@ public class EventToDataIngestImpl implements EventToDataIngest{
 		siteVisit.setTags(tags);
 		return siteVisit;
 	}
+	/**
+	 * This method is for binding IMAGE JSON object to Image model class
+	 * @see com.shutterfly.ltv.util.EventToDataIngest#addImageJSONObject(org.json.simple.JSONObject)
+	 * @param imageJSON 
+	 * @return Image Image object
+	 */
 	public Image addImageJSONObject(JSONObject imageJSON){
 		Image image =  new Image();
 		image.setEventId((String)imageJSON.get("key"));
@@ -114,6 +126,12 @@ public class EventToDataIngestImpl implements EventToDataIngest{
 		return image;
 		
 	}
+	/**
+	 * This method is for binding ORDER JSON object to Image model class
+	 * @see com.shutterfly.ltv.util.EventToDataIngest#addOrderJSONObject(org.json.simple.JSONObject)
+	 * @param orderJSON 
+	 * @return Order Order object
+	 */
 	public Order addOrderJSONObject(JSONObject orderJSON){
 		Order order = new Order();
 		order.setEventId((String)orderJSON.get("key"));
@@ -138,7 +156,12 @@ public class EventToDataIngestImpl implements EventToDataIngest{
 		return order;
 		
 	}
-	public Date parseDate(String dateString) throws ParseException{
+	/**
+	 * This method is for parsing dateString to Date object
+	 * @param dateString 
+	 * @return Date Date object
+	 */
+	private Date parseDate(String dateString) throws ParseException{
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'");
 		Date dateFormatted = dateFormat.parse(dateString);
 		return dateFormatted;

@@ -20,13 +20,14 @@ import org.json.simple.JSONArray;
 //import org.json.JSONArray;
 import org.json.simple.JSONObject;
 /**
+ * DataParserImpl implements DataParse interface methods
  * @author bhanu
- *
+ * @since 07/27/2017
  */
-public class DataParserImpl {
+public class DataParserImpl implements DataParser{
 
 	/**
-	 * This will parse the data text file creates data object with all events
+	 * This will parse the data in text file creates data object with all events
 	 * @param fileName
 	 * @return
 	 */
@@ -64,11 +65,12 @@ public class DataParserImpl {
 	 * @param data
 	 * @return data
 	 */
-	private Data ingestEvent(JSONObject singleEvent, Data data){
+	public Data ingestEvent(JSONObject singleEvent, Data data){
 		String eventType = (String)singleEvent.get("type");
 		EventToDataIngestImpl ingestEvent = null;
 		CustomerLifetimeValueHelper ltvHelper = new CustomerLifetimeValueHelper();
 		System.out.println(eventType);
+		
 		switch(eventType){
 			case "CUSTOMER":
 				ingestEvent = new EventToDataIngestImpl();

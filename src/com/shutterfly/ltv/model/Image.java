@@ -4,6 +4,7 @@
 package com.shutterfly.ltv.model;
 
 /**
+ * Image model class is to store customer image uploads information into the inventory
  * @author bhanu
  * @since 07/27/2017
  *

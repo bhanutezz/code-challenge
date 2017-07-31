@@ -4,6 +4,7 @@
 package com.shutterfly.ltv.model;
 
 /**
+ * Order model class is to store order information of customers for life time value calculation and for further inventory storage
  * @author bhanu
  * @since 07/27/2017
  *

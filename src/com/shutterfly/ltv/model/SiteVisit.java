@@ -3,10 +3,10 @@
  */
 package com.shutterfly.ltv.model;
 
-import java.util.Date;
 import java.util.HashMap;
 
 /**
+ * SiteVisit class is to persist Customer site visit information for life time value calculation and inventory storage
  * @author bhanu
  * @since 07/27/2017
  *

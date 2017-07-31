@@ -5,7 +5,6 @@ package com.shutterfly.ltv.main;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 
 import com.shutterfly.ltv.model.Customer;
 import com.shutterfly.ltv.model.Data;
@@ -13,6 +12,10 @@ import com.shutterfly.ltv.model.Event;
 import com.shutterfly.ltv.util.DataParserImpl;
 
 /**
+ * CustomerLifetimeValue is the main class which originates applicaiton execution.
+ * It calls formData(),createSampleEventObject(), ingest(), topXSimpleLTVCustomers() methods.
+ * formData() method is to ingest text file json data into Data object for calculation
+ * ingest() and topXSimpleLTVCustomers() are the two generic methods can be accessed by classes outside the application. 
  * @author bhanu
  * @since 07/27/2017
  *
@@ -36,7 +39,6 @@ public class CustomerLifetimeValue {
 		// This is to add or update the event in existing data
 		data = clvHelper.ingest(event, data);
 		System.out.println("Ingestion Completed");
-		countEvents(data);
 		// This is to find top customers with highest simple Life Time Value from the data  
 		clvHelper.topXSimpleLTVCustomers(noOfTopLTVCustomers, data);
 	}
@@ -57,21 +59,4 @@ public class CustomerLifetimeValue {
 		}
 		return event;
 	}
-	
-	
-	public static void countEvents(Data data){
-		System.out.println("Data Count");
-		System.out.println("Customers: "+data.getCustomers().size());
-		System.out.println("SiteVisits: "+data.getSiteVisits().size());
-		System.out.println("Orders: "+data.getOrders().size());
-		System.out.println("Images: "+data.getImages().size());
-		System.out.println("CustomerSiteVisits: "+data.getCustomerSiteVisists().size());
-		System.out.println("CustomerOrders: "+data.getCustomerOrders().size());
-		HashMap<String, Customer> map = null;
-		map = data.getCustomers();
-		Customer customer = map.get("96f55c7d8f42");
-		System.out.println(customer.getEventTime().toString());
-		System.out.println(customer.getLastVisited().toString());
-	}
-
 }

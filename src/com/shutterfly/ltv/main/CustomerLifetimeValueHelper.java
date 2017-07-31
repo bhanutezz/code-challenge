@@ -3,6 +3,7 @@ package com.shutterfly.ltv.main;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,8 +27,10 @@ import com.shutterfly.ltv.model.Order;
 import com.shutterfly.ltv.model.SiteVisit;
 
 /**
+ * CustomerLifetimeValueHelper is the main Helper class of this application which consists ingest() and topXSimpleLTVCustomers() as per coding challenge
+ * It also has multiple private methods which are used to event ingestion and to find top customers with life time value
  * @author bhanu
- *
+ * @since 07/27/2017
  */
 public class CustomerLifetimeValueHelper {
 	public static int topXCustomers =0;
@@ -40,6 +43,7 @@ public class CustomerLifetimeValueHelper {
 	 * rather than JSON object, passed event data will be added to existing data or new data to appropriate event type collection
 	 * @param event
 	 * @param data
+	 * @return Data
 	 */
 	public Data ingest(Event event, Data data){
 		//TODO check for event type by extracting type value from event object
@@ -65,19 +69,20 @@ public class CustomerLifetimeValueHelper {
 		return data;
 	}	
 	/**
-	 * should return collection of top customers with lifeTimeValue as HashMap<Customer,double> object
+	 * This method returns customers with highest life time value
 	 * @param x
 	 * @param data
-	 * @return
+	 * @return nothing
 	 */
 	public void topXSimpleLTVCustomers(int x, Data data){
-		HashMap<String, Customer> customers = new HashMap<>();
-		topXCustomers =x;
-		//HashMap<String,ArrayList<SiteVisit>> customerSiteVisists = new HashMap<>();
-		//HashMap<String, LinkedList<Order>> customerOrders = new HashMap<>();
-		Map<Customer, Double> topCust = new HashMap<>();
-		
-			//int totalSite
+		System.out.println("Test");
+		if(x<=data.getCustomers().size()){
+			HashMap<String, Customer> customers = new HashMap<>();
+			topXCustomers =x;
+			//HashMap<String,ArrayList<SiteVisit>> customerSiteVisists = new HashMap<>();
+			//HashMap<String, LinkedList<Order>> customerOrders = new HashMap<>();
+			Map<Customer, Double> topCust = new HashMap<>();
+				//int totalSite
 			if(data.getCustomers()!=null){
 				customers = data.getCustomers();
 				Iterator<?> itr = customers.entrySet().iterator();
@@ -85,21 +90,36 @@ public class CustomerLifetimeValueHelper {
 					ArrayList<SiteVisit> custOrders =new ArrayList<>();
 					double totalAmount = 0;
 					double lifeTimeValue =0;
+					int totalVisits = 0;
+					double visitsPerWeek = 0;
+					double expenditurePerVisit;
 					Map.Entry customerIdPair = (Map.Entry)itr.next();
 					Customer cust = (Customer)customerIdPair.getValue();
 					int numWeeksOfCust = Weeks.weeksBetween(new DateTime(cust.getEventTime()), new DateTime(cust.getLastVisited())).getWeeks();
 					totalAmount = totalAmount(data.getCustomerOrders().get(cust.getCustomerId()));
+					totalVisits = totalVisits(data.getCustomerSiteVisists().get(cust.getCustomerId()));
+					int totalOrderCount = data.getCustomerOrders().get(cust.getCustomerId()).size();
 					if(numWeeksOfCust==0){
 						numWeeksOfCust=1;
 					}
-					lifeTimeValue = 52*(totalAmount/numWeeksOfCust)*data.getAverageCustomerLifespan();
+					if(totalOrderCount==0){
+						totalOrderCount=1;
+					}
+					expenditurePerVisit = totalAmount/totalOrderCount;
+					visitsPerWeek = totalVisits/numWeeksOfCust;
+					lifeTimeValue = 52*(expenditurePerVisit*visitsPerWeek)*data.getAverageCustomerLifespan();
 					topCust.put(cust, lifeTimeValue);	
 				}
 				topCust = sortByComparator(topCust);
 				outPutFile(topCust);
-			}
-		return ;
+			}	
+		}System.out.println("There are only"+data.getCustomers().size()+" customers");
 	}
+	/**
+	 * This method calculates totalAmount from all orders of a customer
+	 * @param list
+	 * @return totalSiteVisits
+	 */
 	private double totalAmount(LinkedList<Order> list){
 		double totalAmount =0;
 		Iterator<Order> itr = list.iterator();
@@ -109,17 +129,36 @@ public class CustomerLifetimeValueHelper {
 		}
 		return totalAmount;
 	}
+	/**
+	 * This method returns total site visits of a customer
+	 * @param custSiteVisits
+	 * @return totalSiteVisits
+	 */
+	private int totalVisits(ArrayList<SiteVisit> custSiteVisits){
+		int totalSiteVisits = 0;
+		for(SiteVisit visist:custSiteVisits){
+			totalSiteVisits++;
+		}
+		return totalSiteVisits;
+	}
+	/**
+	 * This method prints customers with highest life time value in descending order
+	 * @param topCust
+	 * @return Nothing
+	 */
 	private void outPutFile(Map<Customer, Double> topCust){
 		try {
 			FileWriter fw = new FileWriter(new File("output/output.txt").getCanonicalPath());
 			String newLine = System.getProperty("line.separator");
 			Iterator<?> itr = topCust.entrySet().iterator();
+			DecimalFormat df = new DecimalFormat("#.##"); 
 			int temp =topXCustomers;
 			while(itr.hasNext()&&temp!=0){
 				Map.Entry customerPair = (Map.Entry)itr.next();
 				Customer customer = (Customer)customerPair.getKey();
 				double custLifeTimeValue = (double)customerPair.getValue();
-				fw.write(customer.getCustomerId() +"\t"+customer.getLastName()+"\t"+customer.getAdrCity()+"\t"+customer.getAdrState()+"\t"+custLifeTimeValue+newLine);
+				//fw.write(customer.getCustomerId() +"\t"+customer.getLastName()+"\t"+customer.getAdrCity()+"\t"+customer.getAdrState()+"\t"+custLifeTimeValue+newLine);
+				System.out.println(customer.getCustomerId() +"\t"+customer.getLastName()+"\t"+customer.getAdrCity()+"\t"+customer.getAdrState()+"\t"+Double.valueOf(df.format(custLifeTimeValue)));
 				temp--;
 			}
 			
@@ -128,12 +167,17 @@ public class CustomerLifetimeValueHelper {
 			e.printStackTrace();
 		}		
 	}
+	/**
+	 * This method sorts customers with highest life time values
+	 * @param unsortMap unsorted customers with life time values
+	 * @return sortedMap sorted customers with highest life time value
+	 */
 	private static Map<Customer, Double> sortByComparator(Map<Customer, Double> unsortMap){
 		List<Entry<Customer, Double>> list = new LinkedList<Entry<Customer, Double>>(unsortMap.entrySet());
 		// Sorting the list based on values
 		Collections.sort(list, new Comparator<Entry<Customer, Double>>(){
 			public int compare(Entry<Customer, Double> c1, Entry<Customer, Double> c2){
-					return c1.getValue().compareTo(c2.getValue());
+					return c2.getValue().compareTo(c1.getValue());
 				}});
 		// Maintaining insertion order with the help of LinkedLis
 		Map<Customer, Double> sortedMap = new LinkedHashMap<Customer, Double>();
@@ -144,15 +188,25 @@ public class CustomerLifetimeValueHelper {
     }
 
 
+	/**
+	 * This method is to ingest CUSTOMER event information into Data object
+	 * @param event CUSTOMER event
+	 * @param data
+	 * @return Data
+	 */
 	private Data ingestCustomer(Customer event, Data data){
-		if(data!=null){
-			HashMap<String, Customer> customers = data.getCustomers();
+		HashMap<String, Customer> customers =null;
+		if(data!=null&&data.getCustomers()!=null){
+			customers = data.getCustomers();
 			if(customers.containsKey(event.getEventId())){
 				Customer oldCustomer = customers.get(event.getEventId());
 				// To maintain old event time of the customer
 				if(oldCustomer.getEventTime().compareTo(event.getEventTime())==1){
 					event.setEventTime(oldCustomer.getEventTime());
 				}
+				// This is to maintain last site visit date even customer update event occurs
+				// It will be used to get number of weeks a customer account is active
+				event.setLastVisited(oldCustomer.getLastVisited());
 				customers.put(event.getEventId(),event);
 			}else{
 				customers.put(event.getEventId(),event);
@@ -161,9 +215,9 @@ public class CustomerLifetimeValueHelper {
 			return data;
 		}else{
 			Data newData = new Data();
-			HashMap<String, Customer> newCustomer = new HashMap<>();
-			newCustomer.put(event.getEventId(),event);
-			newData.setCustomers(newCustomer);
+			customers = new HashMap<>();
+			customers.put(event.getEventId(),event);
+			newData.setCustomers(customers);
 			HashMap<String,ArrayList<SiteVisit>> customerSiteVisists = new HashMap<String, ArrayList<SiteVisit>>();
 			customerSiteVisists.put(event.getEventId(), new ArrayList<SiteVisit>());
 			HashMap<String, LinkedList<Order>> customerOrders = new HashMap<>();
@@ -173,6 +227,12 @@ public class CustomerLifetimeValueHelper {
 			return newData;
 		}
 	}
+	/**
+	 * This method is to ingest SITE_VISIT event data into Data object
+	 * @param event SITE_VISIT event
+	 * @param data
+	 * @return Data
+	 */
 	private Data ingestSiteVisit(SiteVisit event, Data data){
 		HashMap<String,ArrayList<SiteVisit>> customerSiteVisists = new HashMap<>();
 		HashMap<String, SiteVisit> siteVisits = new HashMap<>();
@@ -185,13 +245,12 @@ public class CustomerLifetimeValueHelper {
 				siteVisits.put(event.getEventId(),event);
 				data.setSiteVisits(siteVisits);
 			}
-			//data.setSiteVisits(siteVisits);
+			// For Customer LTV calculation
 			customerSiteVisists = data.getCustomerSiteVisists();
 			if(customerSiteVisists!=null&&customerSiteVisists.get(event.getCustomerId())!=null&&customerSiteVisists.get(event.getCustomerId()).contains(event)){
 				System.out.println("SiteVisit event already existing with same event id: " +event.getEventId());
 			}else if(customerSiteVisists!=null&&customerSiteVisists.get(event.getCustomerId())==null){
 				aList.add(event);
-				//customerSiteVisists.get(event.getCustomerId()).add(event);
 				customerSiteVisists.put(event.getCustomerId(), aList);
 				data = updateCustomerLastVisitedProperty(data, event.getCustomerId(), event.getEventTime());
 			}else{
@@ -213,15 +272,21 @@ public class CustomerLifetimeValueHelper {
 			return newData;
 		}
 	}
+	/**
+	 * This method is used to ingest IMAGE event data into Data object
+	 * @param event IMAGE event
+	 * @param data
+	 * @return Data
+	 */
 	private Data ingestImage(Image event, Data data){
 		HashMap<String, Image> images = new HashMap<>();
 		if(data!=null){
 			if(data.getImages()==null){
+				images.put(event.getEventId(),event);
 				data.setImages(images);
+			}else{
+				data.getImages().put(event.getEventId(), event);
 			}
-			//HashMap<String, Image> images = data.getImages();
-			images.put(event.getEventId(),event);
-			data.setImages(images);
 			return data;
 		}else{
 			Data newData = new Data();
@@ -231,6 +296,12 @@ public class CustomerLifetimeValueHelper {
 			return newData;
 		}
 	}
+	/**
+	 * This method is used to ingest ORDER event data into Data object
+	 * @param event ORDER event
+	 * @param data
+	 * @return Data
+	 */
 	private Data ingestOrder(Order event, Data data){
 		// customerOrders to map all orders to each customer
 		HashMap<String, LinkedList<Order>> customerOrders = new HashMap<>();
@@ -240,16 +311,16 @@ public class CustomerLifetimeValueHelper {
 		if(data!=null){
 			// for inventory storage
 			if(data.getOrders()==null){
-				orders.put(event.getEventId(),(Order)event);
+				orders.put(event.getEventId(), event);
 				data.setOrders(orders);
 			}else{
-				data.getOrders().put(event.getEventId(),(Order)event);
+				data.getOrders().put(event.getEventId(), event);
 			}
 			// for ltv calculation
 			customerOrders = data.getCustomerOrders();
-			if(customerOrders.get(event.getCustomerId())!=null&&customerOrders.get(event.getCustomerId()).contains(event) && event.getType().equalsIgnoreCase("UPDATE")){
-				customerOrders.get(event.getCustomerId()).add(customerOrders.get(event.getCustomerId()).indexOf(event),event);
-			}else if(customerOrders.get(event.getCustomerId())!=null && customerOrders.get(event.getCustomerId()).contains(event) && event.getType().equalsIgnoreCase("NEW")){
+			if(customerOrders.get(event.getCustomerId())!=null&&event.getVerb().equalsIgnoreCase("UPDATE")){
+				customerOrders.put(event.getCustomerId(), udpateCustomerOrder(customerOrders.get(event.getCustomerId()), event));
+			}else if(customerOrders.get(event.getCustomerId())!=null && event.getVerb().equalsIgnoreCase("NEW")){
 				customerOrders.get(event.getCustomerId()).add(event);
 			}else{
 				customerOrdersList.add(event);
@@ -262,7 +333,7 @@ public class CustomerLifetimeValueHelper {
 			// For inventory
 			String eventId =event.getEventId();
 			if(newData.getOrders()==null){
-				orders.put(eventId,(Order)event);
+				orders.put(eventId,event);
 				newData.setOrders(orders);
 			}
 			// Data formation for LTV calculation 
@@ -272,12 +343,44 @@ public class CustomerLifetimeValueHelper {
 			return newData;
 		}
 	}
-	
+	/**
+	 * This method is used to update the existing order information in Data object
+	 * @param customerOrders
+	 * @param event
+	 * @return Order List of a customer
+	 */
+	private LinkedList<Order> udpateCustomerOrder(LinkedList<Order> customerOrders, Order event){
+		Iterator<Order> orderItr = customerOrders.iterator();
+		while(orderItr.hasNext()){
+			Order order = orderItr.next();
+			if(order.getEventId()==event.getEventId()){
+				order.setType(event.getType());
+				order.setVerb(event.getVerb());
+				order.setEventTime(event.getEventTime());
+				order.setTotalAmount(event.getTotalAmount());
+			}
+		}
+		return customerOrders;
+	}
+	/**
+	 * This method is used to update last visited property of customer
+	 * @param data
+	 * @param customerId
+	 * @param siteVisitedTime
+	 * @return Data
+	 */
 	private Data updateCustomerLastVisitedProperty(Data data, String customerId, Date siteVisitedTime){
 		HashMap<String, Customer> customers = new HashMap<>();
 		if(data.getCustomers()!=null){
 			customers = data.getCustomers();
-			Iterator<?> itr = customers.entrySet().iterator();
+			if(customers.containsKey(customerId)){
+				Customer cust = customers.get(customerId);
+				if(cust.getLastVisited()==null || cust.getLastVisited().compareTo(siteVisitedTime)==-1){
+					cust.setLastVisited(siteVisitedTime);
+					customers.put(customerId, cust);
+				}
+			}
+/*			Iterator<?> itr = customers.entrySet().iterator();
 			while(itr.hasNext()){
 				@SuppressWarnings("rawtypes")
 				Map.Entry customerIdPair = (Map.Entry)itr.next();
@@ -292,7 +395,7 @@ public class CustomerLifetimeValueHelper {
 					data.setCustomers(customers);
 					return data;
 				}
-			}
+			}*/
 		}
 		
 		return data;

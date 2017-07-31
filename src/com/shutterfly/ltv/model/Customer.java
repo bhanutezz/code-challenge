@@ -3,6 +3,7 @@ package com.shutterfly.ltv.model;
 import java.util.Date;
 
 /**
+ * Customer model Class is to persist customer data for life time value calculation and for further inventory storage
  * @author bhanu
  * @since 07/27/2017
  *
